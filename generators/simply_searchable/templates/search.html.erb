@@ -1,0 +1,18 @@
+<h1><%= plural_name %> Search Results</h1>
+
+<table>
+  <tr>
+<% for attribute in args -%>
+    <th><%= attribute %></th>
+<% end -%>
+  </tr>
+
+<%% for <%= singular_name %> in @<%= plural_name %> %>
+  <tr>
+<% for attribute in args -%>
+    <td><%%=h <%= singular_name %>.<%= attribute %> %></td>
+<% end -%>
+    <td><%%= link_to 'Show', <%= singular_name %> %></td>
+  </tr>
+<%% end %>
+</table>

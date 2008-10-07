@@ -1,0 +1,9 @@
+Description:
+    The generator will create the erb template for the search method extended through the plugin, the generator should be run after the simply_searchable is called in the controller.
+
+Example:
+    ./script/generate simply_searchable Post title body 
+
+    This will create:
+        app/views/companies/search.html.erb
+		Which will contain a basic table with two columns 'title' and 'body'
