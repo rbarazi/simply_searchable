@@ -1,0 +1,59 @@
+SimplySearchable
+================
+
+SimplySearchable is a search plugin created by SpinBits - http://spinbits.com.
+
+The main goal of SimplySearchable is to help you create a clean url to search in your controller and model.
+
+This plugin adds a method to the controller named "search" that will find and filter the model data smartly from the search fields defined in its calling line
+
+SimplySearchable recognizes three types of filters:
+1. Exact values: like the title in the example above (acts_as_ferret implementation to come soon)
+2. Belongs to associations: for those fields that ends with _id, like author_id in the example above
+3. Has many association: for those fields that are in plural form, like comments in the example above
+
+Generator:
+----------
+generators will create a simple search view 'search.html.erb' which has a very basic table with your results in the views folder of your simply searchable controller.
+
+Example:
+--------
+In your controller:
+	simply_searchable :fields => ['title', 'author_id', 'comments'], :order  => 'created_at DESC'
+
+This will create a search method that search any text given to be the 'title', and search the belongs_to association with 'authors' and finally the has_many association with 'comments'.
+
+i.e. /posts/search?author_id=1&comments[]=1&comments[]=3
+This url will search posts from the author with id 1 AND has comments with ids 1 and 3
+
+Quick installation:
+-------------------
+Let's say you have a Post model and PostsController and you want to search by author and comments:
+
+1. Install the plugin:
+		./script/plugin install svn://code.spinbits.com/plugins/simply_searchable/trunk
+2. In your PostsController add: 
+		simply_searchable :fields => ['title', 'author_id', 'comments']
+3. In your routes.rb add search method to your desired resource:
+		map.resources :posts, :collection => {:search => :get}
+4. Generate the search results page that shows the post's title and body:
+		./script/generate simply_searchable Post title body
+5. visit /posts/search and start passing your filters:
+		/posts/search?author_id=1									# View posts from author 1
+		/posts/search?title="test"								# View posts with the title 'test'
+		/posts/search?comments=1&author_id=3			# View posts that has comment 1 and written by author 3
+		/posts/search?author_id[]=1&author_id[]=2 # View posts from both authors 1 and 2
+
+Integrations:
+-------------
+This plugin has integrations with will_paginate:
+	 ./script/plugin install svn://errtheblog.com/svn/plugins/will_paginate
+
+To integrate will_paginate just pass :with_pagination => {:per_page => X} (X is your preferred number of results per page) to simply_searchable calling line and you're all set.
+
+TODO:
+-----
+* Launch the acts_as_ferret integration.
+* Move most of the logic to the model instead of the controller.
+* Enhance the generated view and add a couple more partials.
+* Have some sort of callbacks before and after the search method
