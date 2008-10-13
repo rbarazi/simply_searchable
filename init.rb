@@ -1,2 +1,2 @@
 require 'simply_searchable'
-ActionController::Base.send(:include, SpinBits::SimplySearchable)
+ActiveRecord::Base.send(:include, SpinBits::SimplySearchable)
