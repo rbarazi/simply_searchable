@@ -40,8 +40,9 @@ module SpinBits
       # Will return the posts that contain 'abc' in their title and created today.
       def list(options)
         listings = self
-        self.column_names.each do |column_name|
-          listings = listings.send("where_#{column_name}".to_sym, options[column_name.to_sym]) unless options[column_name.to_sym].blank?
+        options.each_pair do |key, value|
+          key = key.to_s
+          listings = listings.send("where_#{key}".to_sym, value) unless value.blank? or !self.column_names.include?key
         end
         return listings.paginate(:page => options[:page])
       end
