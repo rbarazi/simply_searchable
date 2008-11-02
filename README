@@ -38,6 +38,12 @@ It will also create the method 'list' which you can use like:
   
 Which will return the posts that contain 'abc' in their title and created today.
 
-TODO:
------
-* Make will_paginate support optional
+By default SimplySearchable list will_paginate, you can still customize its settings or disable it:
+
+  class Post < ActiveRecord::Base
+    simply_searchable :will_paginate => false
+  end
+
+  class Post < ActiveRecord::Base
+    simply_searchable :per_page => 20
+  end
