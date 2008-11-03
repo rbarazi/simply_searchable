@@ -1,5 +1,4 @@
-SimplySearchable
-================
+= SimplySearchable
 
 SimplySearchable is a search plugin created by Rida Al Barazi to be used in SpinBits's Skeleton App.
 
@@ -7,8 +6,10 @@ The main goal of SimplySearchable is to make it easy to do queries on your model
 
 This plugin adds a method to the model named "list" that will find and filter records smartly.
 
-Example:
---------
+RDoc available at: http://ridaalbarazi.com/code/simply_searchable/
+
+== Example:
+
 If you have the following attributes in you posts table:
 
   Post

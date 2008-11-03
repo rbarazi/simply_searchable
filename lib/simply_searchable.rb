@@ -1,5 +1,5 @@
-module SpinBits
-  module SimplySearchable
+module RidaAlBarazi #:nodoc:   
+  module SimplySearchable #:nodoc:
     
     def self.included(base) #:nodoc:
       base.extend ClassMethods
@@ -63,4 +63,4 @@ module SpinBits
       end
     end # ClassMethods
   end # SimplySearchable
-end # SpinBits
+end # RidaAlBarazi
