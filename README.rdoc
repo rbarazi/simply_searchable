@@ -1,10 +1,10 @@
 = SimplySearchable
 
-SimplySearchable is a search plugin created by {Rida Al Barazi}[http://ridaalbarazi.com] to be used in {SpinBits}[http://spinbits.com]'s Skeleton App.
+SimplySearchable is a search plugin created by Rida Al Barazi - http://rida.me] to be used in SpinBits's Skeleton App.
 
 The main goal of SimplySearchable is to make it easy to do queries on your model by auto-magically creating some named_scope methods for common conditions, it adds a method to the model named "list" that will find and filter records smartly.
 
-Please submit your bugs, requests and feedback at the project’s page on {Lighthouse}[http://rbarazi.lighthouseapp.com/projects/19246/home]. RDocs are available at {http://ridaalbarazi.com/code/simply_searchable/}[http://ridaalbarazi.com/code/simply_searchable/].
+Please submit your bugs, requests and feedback at the project’s page on Lighthouse - http://rbarazi.lighthouseapp.com/projects/19246/home. RDocs are available at http://ridaalbarazi.com/code/simply_searchable/.
 
 == Example:
 
