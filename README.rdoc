@@ -1,12 +1,10 @@
 = SimplySearchable
 
-SimplySearchable is a search plugin created by Rida Al Barazi to be used in SpinBits's Skeleton App.
+SimplySearchable is a search plugin created by {Rida Al Barazi}[http://ridaalbarazi.com] to be used in {SpinBits}[http://spinbits.com]'s Skeleton App.
 
-The main goal of SimplySearchable is to make it easy to do queries on your model by automagically create some named_scope methods for common conditions.
+The main goal of SimplySearchable is to make it easy to do queries on your model by auto-magically creating some named_scope methods for common conditions, it adds a method to the model named "list" that will find and filter records smartly.
 
-This plugin adds a method to the model named "list" that will find and filter records smartly.
-
-RDoc available at: http://ridaalbarazi.com/code/simply_searchable/
+Please submit your bugs, requests and feedback at the project’s page on {Lighthouse}[http://rbarazi.lighthouseapp.com/projects/19246/home]. RDocs are available at {http://ridaalbarazi.com/code/simply_searchable/}[http://ridaalbarazi.com/code/simply_searchable/].
 
 == Example:
 
@@ -39,12 +37,16 @@ It will also create the method 'list' which you can use like:
   
 Which will return the posts that contain 'abc' in their title and created today.
 
-By default SimplySearchable list will_paginate, you can still customize its settings or disable it:
+By default SimplySearchable list will_paginate, you can still disable it:
 
   class Post < ActiveRecord::Base
     simply_searchable :will_paginate => false
   end
 
+Or customize its settings:
+
   class Post < ActiveRecord::Base
     simply_searchable :per_page => 20
   end
+
+In the new implementation there is no support for associations’ filtering yet, it will come very soon though so stay tuned.
