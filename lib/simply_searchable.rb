@@ -34,7 +34,7 @@ module RidaAlBarazi #:nodoc:
       #
       def simply_searchable(options = {})
         options.reverse_merge!(:per_page => 30, :with_pagination => true)
-        class_inheritable_accessor :attrs, :with_pagination, :per_page
+        class_inheritable_accessor :attrs, :with_pagination, :per_page, :associations
         self.with_pagination = options[:with_pagination]
         self.per_page = options[:per_page]
         self.attrs = self.columns.collect{|c| [c.name, c.type]}
@@ -44,6 +44,17 @@ module RidaAlBarazi #:nodoc:
             named_scope "where_#{attribute[0]}".to_sym, lambda {|value| { :conditions => ["#{attribute[0]} like ?", "%#{value}%"] }}          
           else  
             named_scope "where_#{attribute[0]}".to_sym, lambda {|value| { :conditions => ["#{attribute[0]} = ?", value] }}          
+          end
+        end
+        self.associations = self.reflections.collect{|key,value| [key, value.macro]}
+        self.associations.each do |association|
+          case association[1]
+          when :has_many then 
+            named_scope "where_#{association[0].to_s}".to_sym, 
+              lambda {|value| { :include => association[0], :conditions => ["#{association[0]}.id in (?)", [*value]] }}          
+          when :belongs_to then  
+            named_scope "where_#{association[0]}".to_sym, 
+              lambda {|value| { :conditions => ["#{association[0]}_id in (?)", [*value]] }}          
           end
         end
       end
