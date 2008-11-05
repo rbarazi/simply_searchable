@@ -1,2 +1,2 @@
 require 'simply_searchable'
-ActiveRecord::Base.send(:include, SpinBits::SimplySearchable)
+ActiveRecord::Base.send(:include, RidaAlBarazi::SimplySearchable)
