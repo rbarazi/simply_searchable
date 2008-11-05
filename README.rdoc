@@ -20,6 +20,9 @@ If you have the following attributes in you posts table:
 In your Model:
 
   class Post < ActiveRecord::Base
+    has_many   :comments
+    belongs_to :category
+    
   	simply_searchable
   end
 
@@ -30,12 +33,14 @@ This will create the following named scopes:
   named_scope where_body,       lambda {|value| { :conditions => ["body like ?", "%#{value}%"] }}
   named_scope where_created_at, lambda {|value| { :conditions => ["created_at = ?", value] }}
   named_scope where_updated_at, lambda {|value| { :conditions => ["updated_at = ?", value] }}
+  named_scope where_categories, lambda {|value| { :conditions => ["category_id in (?)", [*value]] }}
+  named_scope where_comments,   lambda {|value| { :conditions => ["comments.ids in (?)", [*value]] }}
 
 It will also create the method 'list' which you can use like:
 
-  Post.list(:title => 'abc', :created_at => Date.today)
+  Post.list(:title => 'abc', :created_at => Date.today, :category => [1,3])
   
-Which will return the posts that contain 'abc' in their title and created today.
+Which will return the posts that contain 'abc' in their title and created today from categories 1 and 3.
 
 By default SimplySearchable list will_paginate, you can still disable it:
 
