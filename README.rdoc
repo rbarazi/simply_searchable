@@ -1,6 +1,6 @@
 = SimplySearchable
 
-SimplySearchable is a search plugin created by Rida Al Barazi - http://rida.me] to be used in SpinBits's Skeleton App.
+SimplySearchable is a search plugin created by Rida Al Barazi - http://rida.me to be used in SpinBits's Skeleton App.
 
 The main goal of SimplySearchable is to make it easy to do queries on your model by auto-magically creating some named_scope methods for common conditions, it adds a method to the model named "list" that will find and filter records smartly.
 
@@ -22,8 +22,7 @@ In your Model:
   class Post < ActiveRecord::Base
     has_many   :comments
     belongs_to :category
-    
-  	simply_searchable
+    simply_searchable
   end
 
 This will create the following named scopes:
