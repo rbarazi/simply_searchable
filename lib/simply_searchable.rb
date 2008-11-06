@@ -67,8 +67,9 @@ module RidaAlBarazi #:nodoc:
       def list(options={})
         listings = self
         options.each_pair do |key, value|
-          key = key.to_s
-          listings = listings.send("where_#{key}".to_sym, value) unless value.blank? or !self.column_names.include?key
+          if !value.blank? and (self.column_names.include?key.to_s or self.reflections.keys.include?key.to_sym)
+            listings = listings.send("where_#{key.to_s}".to_sym, value) 
+          end
         end
         return Post.with_pagination ? listings.paginate(:page => options[:page], :per_page => options[:per_page]) : listings.all
       end
