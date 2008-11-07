@@ -52,5 +52,3 @@ Or customize its settings:
   class Post < ActiveRecord::Base
     simply_searchable :per_page => 20
   end
-
-In the new implementation there is no support for associations’ filtering yet, it will come very soon though so stay tuned.
