@@ -14,6 +14,7 @@ If you have the following attributes in you posts table:
   	id:integer
   	title:string
   	body:text
+  	category_id:integer
   	created_at:datetime
   	updated_at:datetime
 

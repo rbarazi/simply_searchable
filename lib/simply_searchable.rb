@@ -12,6 +12,7 @@ module RidaAlBarazi #:nodoc:
       # 		id:integer
       # 		title:string
       # 		body:text
+      #     category_id:integer
       # 		created_at:datetime
       # 		updated_at:datetime
       # 
@@ -41,10 +42,10 @@ module RidaAlBarazi #:nodoc:
         self.attrs.each do |attribute|
           case attribute[1]
           when :text, :string then 
-            named_scope "where_#{attribute[0]}".to_sym, lambda {|value| { :conditions => ["#{attribute[0]} like ?", "%#{value}%"] }}          
+            named_scope "where_#{attribute[0]}".to_sym, lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} like ?", "%#{value}%"] }}   
           else  
             named_scope "where_#{attribute[0]}".to_sym, 
-              lambda {|value| { :conditions => ["#{attribute[0]} in (?)", [*value]] }}          
+              lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} in (?)", [*value]] }}          
           end
         end
         self.associations = self.reflections.collect{|key,value| [key, value.macro]}
@@ -55,7 +56,7 @@ module RidaAlBarazi #:nodoc:
               lambda {|value| { :include => association[0], :conditions => ["#{association[0].to_s.tableize}.id in (?)", [*value]] }}          
           when :belongs_to then  
             named_scope "where_#{association[0]}".to_sym, 
-              lambda {|value| { :conditions => ["#{association[0]}_id in (?)", [*value]] }}          
+              lambda {|value| { :conditions => ["#{self.table_name}.#{association[0]}_id in (?)", [*value]] }}          
           end
         end
       end
