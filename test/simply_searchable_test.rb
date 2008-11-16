@@ -22,6 +22,12 @@ def setup_db
       t.column :created_at, :datetime
       t.column :updated_at, :datetime
     end
+    create_table :categories do |t|
+      t.column :id, :integer
+      t.column :name, :string
+      t.column :created_at, :datetime
+      t.column :updated_at, :datetime
+    end
   end
 end
  
@@ -45,7 +51,8 @@ class SimplySearchableTest < Test::Unit::TestCase
   
   def setup
     setup_db
-    @post = Post.create(:title => 'Some title', :body => 'Some text here', :category_id => 1)
+    @category = Category.create(:name => 'The category')
+    @post = Post.create(:title => 'Some title', :body => 'Some text here', :category_id => @category.id)
   end
  
   def teardown
@@ -53,6 +60,7 @@ class SimplySearchableTest < Test::Unit::TestCase
   end
  
   def test_creation_of_named_scope_methods_for_attributes
+    assert Post.methods.include?('where_id')
     assert Post.methods.include?('where_title')
     assert Post.methods.include?('where_body')
   end
@@ -63,5 +71,14 @@ class SimplySearchableTest < Test::Unit::TestCase
   
   def test_creation_of_list
     assert Post.methods.include?('list')
+  end
+  
+  def test_attributes_conditions
+    assert !Post.where_title('title').empty?
+    assert !Post.where_body('text').empty?
+  end
+  
+  def test_associations_conditions
+    assert !Post.where_category(@category.id).empty?
   end
 end
