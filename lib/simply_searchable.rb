@@ -73,7 +73,7 @@ module RidaAlBarazi #:nodoc:
             listings = listings.send("where_#{key.to_s}".to_sym, value) 
           end
         end
-        return Post.with_pagination ? listings.paginate(:page => options[:page], :per_page => options[:per_page]) : listings.all
+        return self.with_pagination ? listings.paginate(:page => options[:page], :per_page => options[:per_page]) : listings.all
       end
     end # ClassMethods
   end # SimplySearchable
