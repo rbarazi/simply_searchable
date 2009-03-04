@@ -1,0 +1,2 @@
+- Integrate Timestamp filter from - http://workswithruby.com/2009/2/application-wide-timeranges-3
+- Make sure returned 'list' is a scoped array of objects
