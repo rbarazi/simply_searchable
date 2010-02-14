@@ -35,23 +35,39 @@ module RidaAlBarazi #:nodoc:
       #
       def simply_searchable(options = {})
         options.reverse_merge!(:per_page => 30, :with_pagination => true)
-        class_inheritable_accessor :attrs, :with_pagination, :per_page, :associations
+        class_inheritable_accessor :attrs, :with_pagination, :per_page, :associations, :with_tags
         self.with_pagination = options[:with_pagination]
+        self.with_tags = options[:with_tags]
         self.per_page = options[:per_page]
-        self.attrs = self.columns.collect{|c| [c.name, c.type]}
+        self.attrs = self.columns.collect{|c| [c.name, c.type] unless [*options[:except]].include?(c.name.to_sym)}.compact
         self.attrs.each do |attribute|
           case attribute[1]
           when :text, :string then 
-            named_scope "where_#{attribute[0]}".to_sym, lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} like ?", "%#{value}%"] }}   
+            named_scope "where_#{attribute[0]}".to_sym, lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} like ?", "%#{value}%"] }}
           else  
             named_scope "where_#{attribute[0]}".to_sym, 
               lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} in (?)", [*value]] }}          
           end
+          # Filtering scopes
+          named_scope "where_#{attribute[0]}_starts_with".to_sym, lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} like ?", "#{value}%"] }}   
+          named_scope "where_#{attribute[0]}_ends_with".to_sym, lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} like ?", "%#{value}"] }}   
+          named_scope "where_#{attribute[0]}_contains".to_sym, lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} like ?", "%#{value}%"] }}   
+          named_scope "where_#{attribute[0]}_does_not_contain".to_sym, lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} not like ?", "%#{value}%"] }}   
+          named_scope "where_#{attribute[0]}_is_available".to_sym, :conditions => "#{self.table_name}.#{attribute[0]} is not null"
+          named_scope "where_#{attribute[0]}_is_not_available".to_sym, :conditions => "#{self.table_name}.#{attribute[0]} is null"
+          named_scope "where_#{attribute[0]}_is".to_sym, 
+            lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} = ?", value] }}
+          named_scope "where_#{attribute[0]}_greater_than".to_sym, 
+            lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} > ?", value] }}
+          named_scope "where_#{attribute[0]}_lesser_than".to_sym, 
+            lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} < ?", value] }}
+          named_scope "where_#{attribute[0]}_is_not".to_sym, 
+            lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} <> ?", value] }}
         end
         self.associations = self.reflections.collect{|key,value| [key, value.macro]}
         self.associations.each do |association|
           case association[1]
-          when :has_many, :has_one, :has_and_belong_to_many then 
+          when :has_many, :has_one, :has_and_belongs_to_many then 
             named_scope "where_#{association[0].to_s}".to_sym, 
               lambda {|value| { :include => association[0], :conditions => ["#{association[0].to_s.tableize}.id in (?)", [*value]] }}          
           when :belongs_to then  
@@ -59,6 +75,9 @@ module RidaAlBarazi #:nodoc:
               lambda {|value| { :conditions => ["#{self.table_name}.#{association[0]}_id in (?)", [*value]] }}          
           end
         end
+        self.attrs = self.attrs.collect(&:first)
+        self.attrs += self.associations.collect{|a| a[0].to_s}
+        self.attrs += [*options[:include]] if [*options[:include]].any?
       end
       
       # Return records that matches the passed params, for example:
@@ -66,14 +85,35 @@ module RidaAlBarazi #:nodoc:
       # Post.list(:title => 'abc', :created_at => Date.today)
       # 
       # Will return the posts that contain 'abc' in their title and created today.
-      def list(options={})
+      def list(options={}, find_options={})
+        listings = find_proxy(options)        
+        return self.with_pagination ? listings.paginate(:page => options[:page], :per_page => options[:per_page]) : listings.scoped(find_options)
+      end
+      
+      def find_proxy(options)
         listings = self
+        filters = (options[:filters] || {})
+        filters.values.each do |filter|
+          if (self.attrs.include?filter[:field].to_s) and !filter[:criteria].blank?
+            if filter[:value].blank?
+              listings = listings.send("where_#{filter[:field].to_s}_#{filter[:criteria]}".to_sym)
+            else 
+              listings = listings.send("where_#{filter[:field].to_s}_#{filter[:criteria]}".to_sym, filter[:value]) 
+            end
+          elsif filter[:field].to_s == 'tags' and self.with_tags
+            listings = case filter[:criteria]
+            when 'excluding' then listings.find_tagged_with(filter[:value], :exclude => true)
+            when 'matching'  then listings.find_tagged_with(filter[:value], :match_all => true)
+            else                  listings.find_tagged_with(filter[:value])
+            end
+          end
+        end
         options.each_pair do |key, value|
-          if !value.blank? and (self.column_names.include?key.to_s or self.reflections.keys.include?key.to_sym)
+          if !value.blank? and (self.attrs.include?key.to_s)
             listings = listings.send("where_#{key.to_s}".to_sym, value) 
           end
         end
-        return self.with_pagination ? listings.paginate(:page => options[:page], :per_page => options[:per_page]) : listings.all
+        return listings
       end
     end # ClassMethods
   end # SimplySearchable
