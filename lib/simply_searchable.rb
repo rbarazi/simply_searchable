@@ -43,7 +43,7 @@ module RidaAlBarazi #:nodoc:
         self.attrs.each do |attribute|
           case attribute[1]
           when :text, :string then 
-            named_scope "where_#{attribute[0]}".to_sym, lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} like ?", "%#{value}%"] }}
+            named_scope "where_#{attribute[0]}_starts_with".to_sym, lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} like ?", "%#{value}%"] }}
           else  
             named_scope "where_#{attribute[0]}".to_sym, 
               lambda {|value| { :conditions => ["#{self.table_name}.#{attribute[0]} in (?)", [*value]] }}          
@@ -76,7 +76,6 @@ module RidaAlBarazi #:nodoc:
           end
         end
         self.attrs = self.attrs.collect(&:first)
-        self.attrs += self.associations.collect{|a| a[0].to_s}
         self.attrs += [*options[:include]] if [*options[:include]].any?
       end
       
@@ -86,12 +85,12 @@ module RidaAlBarazi #:nodoc:
       # 
       # Will return the posts that contain 'abc' in their title and created today.
       def list(options={}, find_options={})
-        listings = find_proxy(options)        
+        listings = find_proxy(options)
         return self.with_pagination ? listings.paginate(:page => options[:page], :per_page => options[:per_page]) : listings.scoped(find_options)
       end
       
       def find_proxy(options)
-        listings = self
+        listings = self.scoped({})
         filters = (options[:filters] || {})
         filters.values.each do |filter|
           if (self.attrs.include?filter[:field].to_s) and !filter[:criteria].blank?
